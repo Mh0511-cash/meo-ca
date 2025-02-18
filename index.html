@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pháo Hoa Mèo Khùng <3 Cá Thúi</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: #000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      flex-direction: column;
+    }
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 1;
+    }
+    h1 {
+      color: white;
+      font-size: 3rem;
+      font-family: 'Arial', sans-serif;
+      text-shadow: 0 0 10px #ff00ff, 0 0 20px #ff00ff, 0 0 30px #ff00ff;
+      z-index: 2;
+      display: none; /* Ẩn ban đầu */
+      animation: dance 2s infinite ease-in-out;
+    }
+    button {
+      padding: 15px 30px;
+      font-size: 1.5rem;
+      font-family: 'Arial', sans-serif;
+      background: #ff00ff;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      z-index: 2;
+    }
+    button:hover {
+      background: #cc00cc;
+    }
+
+    @keyframes dance {
+      0%, 100% {
+        transform: translateY(0) rotate(0deg);
+      }
+      25% {
+        transform: translateY(-10px) rotate(-5deg);
+      }
+      50% {
+        transform: translateY(0) rotate(0deg);
+      }
+      75% {
+        transform: translateY(-10px) rotate(5deg);
+      }
+    }
+  </style>
+</head>
+<body>
+  <button id="startButton">BẤM VÀO ĐÂY ĐI MÈO</button>
+  <h1 id="text">CÁ THÚI <3 MÈO KHÙNG</h1>
+  <canvas id="fireworks"></canvas>
+  <script>
+    const canvas = document.getElementById('fireworks');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const startButton = document.getElementById('startButton');
+    const textElement = document.getElementById('text');
+
+    // Hiển thị chữ và bắt đầu hiệu ứng pháo hoa khi nhấn nút
+    startButton.addEventListener('click', () => {
+      startButton.style.display = 'none'; // Ẩn nút
+      textElement.style.display = 'block'; // Hiển thị chữ
+      startFireworks(); // Bắt đầu hiệu ứng pháo hoa
+    });
+
+    class Firework {
+      constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = canvas.height;
+        this.speed = Math.random() * 5 + 5;
+        this.color = `hsl(${Math.random() * 360}, 100%, 50%)`;
+        this.radius = Math.random() * 3 + 2;
+      }
+
+      update() {
+        this.y -= this.speed;
+        if (this.y < canvas.height / 2) {
+          this.explode();
+          fireworks.splice(fireworks.indexOf(this), 1);
+        }
+      }
+
+      draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fillStyle = this.color;
+        ctx.fill();
+      }
+
+      explode() {
+        for (let i = 0; i < 30; i++) { // Giảm số lượng hạt pháo hoa
+          particles.push(new Particle(this.x, this.y, this.color));
+        }
+      }
+    }
+
+    class Particle {
+      constructor(x, y, color) {
+        this.x = x;
+        this.y = y;
+        this.color = color;
+        this.velocity = {
+          x: (Math.random() - 0.5) * 3,
+          y: (Math.random() - 0.5) * 3
+        };
+        this.alpha = 1;
+      }
+
+      draw() {
+        ctx.save();
+        ctx.globalAlpha = this.alpha;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, 2, 0, Math.PI * 2);
+        ctx.fillStyle = this.color;
+        ctx.fill();
+        ctx.restore();
+      }
+
+      update() {
+        this.x += this.velocity.x;
+        this.y += this.velocity.y;
+        this.alpha -= 0.01;
+      }
+    }
+
+    let fireworks = [];
+    let particles = [];
+
+    function startFireworks() {
+      function animate() {
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        fireworks.forEach((firework, index) => {
+          firework.update();
+          firework.draw();
+        });
+
+        particles.forEach((particle, index) => {
+          if (particle.alpha <= 0) {
+            particles.splice(index, 1);
+          } else {
+            particle.update();
+            particle.draw();
+          }
+        });
+
+        if (Math.random() < 0.03) {
+          fireworks.push(new Firework());
+        }
+
+        requestAnimationFrame(animate);
+      }
+
+      animate();
+    }
+
+    // Thay đổi màu chữ ngẫu nhiên
+    setInterval(() => {
+      if (textElement.style.display === 'block') {
+        textElement.style.color = `hsl(${Math.random() * 360}, 100%, 50%)`;
+      }
+    }, 1000);
+  </script>
+</body>
+</html>
